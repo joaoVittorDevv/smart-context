@@ -1,0 +1,45 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/startup.sh",
+            "description": "Exibe estado atual do projeto e últimas entradas do journal",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-end.sh",
+            "description": "Verifica se state.md e journal.md foram atualizados antes de encerrar",
+            "timeout": 3000
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(uv add*)",
+      "Bash(uv run*)",
+      "Bash(uv sync*)",
+      "Read(**)",
+      "Write(docs/**)",
+      "Write(.claude/**)",
+      "Edit(**)"
+    ],
+    "deny": [
+      "Bash(pip install*)",
+      "Bash(python -m pip*)"
+    ]
+  }
+}

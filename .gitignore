@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# MCP Context Server - Database
+.claude/context.db
+.claude/context.db-shm
+.claude/context.db-wal
+.claude/context.log
+.claude/.session_start_time
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
