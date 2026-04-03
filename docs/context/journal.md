@@ -559,3 +559,19 @@ O **MVP do MCP Context Server** está pronto para uso!
 #### Bloqueios
 - Nenhum
 
+
+---
+
+## 2026-04-03 - Omni-Language Plan Iniciado (Fase 0)
+
+### Sessão: Desenvolvimento de arquitetura dinâmica multi-linguagem
+**Horário:** 10:24
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Planejamento Omni-Language:** Criado plano de arquitetura em 5 Fases para suportar as linguagens (Python, JS, TS, Go, Rust, Java, C++) usando o `TreeSitterParser` e adaptando o `IncrementalIndexer`.
+2. **Definição de contrato de indexação:** Determinado que o banco referencial SQLite (`type IN ('class', 'function', 'method')`) não mudará; *structs*, *traits* ou *interfaces* espelharão os arquétipos base.
+
+#### Próximos Passos
+- Executar Baby Step da **Fase 0**: Dinamizar e abstrair o TreeSitterParser e o Indexer, adaptando CLI `--language`.
+
