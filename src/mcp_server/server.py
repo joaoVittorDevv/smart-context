@@ -15,14 +15,14 @@ from ..database.connection import DatabaseConnection
 from ..database.repositories import RepositoryManager
 
 
-# Configure logging
+# Configure logging - ONLY file handler to avoid STDIO pollution
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler(Path.home() / '.claude' / 'context.log'),
-        logging.StreamHandler()
-    ]
+    ],
+    force=True  # Override any previous logging configuration
 )
 logger = logging.getLogger(__name__)
 
