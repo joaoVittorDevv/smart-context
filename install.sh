@@ -26,6 +26,10 @@ uv pip install -e "$PROJECT_ROOT"
 CLAUDE_DIR="$HOME/.claude"
 mkdir -p "$CLAUDE_DIR"
 
+# Invoke interactive initialization wizard
+echo "🧭 Starting project initialization Wizard..."
+uv run python "$PROJECT_ROOT/main.py" init
+
 echo ""
 echo "✅ Installation complete!"
 echo ""
@@ -54,7 +58,9 @@ echo "   mcpServers:"
 echo "     - name: mcp-context"
 echo "       command: mcp-context-server"
 echo ""
+echo "💡 Tip: If you cloned this repo into a .mcp/ folder, "
+echo "the wizard has already correctly pointed the indexing to your parent folder!"
+echo ""
 echo "3. Index your code:"
-echo "   cd $PROJECT_ROOT"
-echo "   mcp-context index"
+echo "   mcp-context index --full"
 echo ""

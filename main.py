@@ -11,6 +11,11 @@ from pathlib import Path
 
 from src.indexer.incremental import IncrementalIndexer
 from src.database.connection import DatabaseConnection
+from src.database.repositories import RepositoryManager
+import questionary
+import json
+import os
+from collections import Counter
 
 
 def cmd_index(args):
@@ -65,10 +70,114 @@ def cmd_stats(args):
 
 
 def cmd_init(args):
-    """Handle init command."""
+    """Handle init command with interactive wizard."""
     db = DatabaseConnection(db_path=args.db_path)
     db.create_tables()
+    session = DatabaseConnection.get_session()
+    repos = RepositoryManager(session)
+
     print(f"✅ Database initialized at {db.db_path}")
+
+    # Determine project root
+    # If we are in project/.mcp/, the root is project/
+    current_path = Path.cwd().resolve()
+    if current_path.name == '.mcp' or (current_path / 'src' / 'database').exists():
+        # We are likely inside the context server directory
+        # If it's a hidden .mcp folder, go up one level
+        if current_path.name == '.mcp':
+            project_root = current_path.parent
+        else:
+            # Maybe it's just the cloned repo, assume parent is the project target
+            project_root = current_path.parent
+    else:
+        project_root = current_path
+
+    print(f"📂 Project Root identified as: {project_root}")
+
+    # Discovery of folders
+    exclude_folders = {'.git', 'node_modules', '__pycache__', '.venv', '.mcp', '.pytest_cache', 'dist', 'build'}
+    available_folders = []
+    
+    for item in project_root.iterdir():
+        if item.is_dir() and item.name not in exclude_folders and not item.name.startswith('.'):
+            available_folders.append(item.name)
+
+    if not available_folders:
+        print("⚠️ No subdirectories found in project root to index.")
+        repos.metadata.set_included_folders([])
+        repos.metadata.set_project_root(str(project_root))
+        repos.commit()
+        return
+
+    # Interactive Checklist
+    selected_folders = questionary.checkbox(
+        "Select folders to monitor and index:",
+        choices=[
+            questionary.Choice(folder, checked=True if folder in ('src', 'app', 'lib', 'packages') else False)
+            for folder in sorted(available_folders)
+        ]
+    ).ask()
+
+    if selected_folders is None:
+        print("❌ Initialization cancelled.")
+        return
+
+    # --- Discovery Preview (Dry-Run) ---
+    print("\n🔍 Scanning selected folders for a preview...")
+    extensions_found = Counter()
+    total_files = 0
+    
+    supported_exts = {'.py', '.js', '.ts', '.tsx', '.jsx', '.go', '.rs', '.java', '.cpp', '.hpp', '.h'}
+    
+    for folder in selected_folders:
+        folder_path = project_root / folder
+        for file_path in folder_path.rglob('*'):
+            if file_path.is_file() and file_path.suffix in supported_exts:
+                if not any(part.startswith('.') or part == 'node_modules' for part in file_path.parts):
+                    extensions_found[file_path.suffix] += 1
+                    total_files += 1
+
+    print("\n" + "="*40)
+    print("📋 DISCOVERY PREVIEW (Dry-Run)")
+    print("="*40)
+    print(f"📂 Folders: {', '.join(selected_folders)}")
+    print(f"📄 Potential files to index: {total_files}")
+    print("-" * 40)
+    if extensions_found:
+        print("🌐 Languages detected:")
+        for ext, count in sorted(extensions_found.items(), key=lambda x: x[1], reverse=True):
+            lang_label = ext[1:].upper()
+            print(f"   • {lang_label}: {count} files")
+    else:
+        print("⚠️ No supported source files found in the selected folders.")
+    print("="*40 + "\n")
+
+    confirm_start = questionary.confirm(
+        "Everything looks correct? Do you want to save and start the FULL indexing now?",
+        default=True
+    ).ask()
+
+    if not confirm_start:
+        print("💾 Configuration NOT saved. Initialization aborted.")
+        return
+
+    # Save to database
+    repos.metadata.set_included_folders(selected_folders)
+    repos.metadata.set_project_root(str(project_root))
+    repos.commit()
+
+    print(f"\n✨ Configuration Saved!")
+    
+    # Trigger full index immediately
+    print(f"🚀 Starting FULL indexing of {len(selected_folders)} folders...")
+    indexer = IncrementalIndexer(project_root=str(project_root))
+    stats = indexer.index_full()
+    
+    print(f"\n✅ Initial indexing complete in {stats['time_ms']}ms")
+    print(f"   Files indexed: {stats['files_indexed']}")
+    print(f"   Symbols found: {stats['symbols_created']}")
+
+    repos.close()
 
 
 def main():

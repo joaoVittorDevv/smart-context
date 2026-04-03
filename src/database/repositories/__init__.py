@@ -8,6 +8,7 @@ from .base import BaseRepository
 from .symbol_repo import SymbolRepository
 from .dependency_repo import DependencyRepository
 from .observation_repo import ObservationRepository
+from .metadata_repo import MetadataRepository
 
 
 class RepositoryManager:
@@ -30,6 +31,7 @@ class RepositoryManager:
         self.symbols = SymbolRepository(session)
         self.dependencies = DependencyRepository(session)
         self.observations = ObservationRepository(session)
+        self.metadata = MetadataRepository(session)
 
     def commit(self):
         """Commit pending changes."""
@@ -49,5 +51,6 @@ __all__ = [
     'SymbolRepository',
     'DependencyRepository',
     'ObservationRepository',
+    'MetadataRepository',
     'RepositoryManager'
 ]

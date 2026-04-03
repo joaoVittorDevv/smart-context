@@ -38,9 +38,11 @@ async def handle_get_project_summary(arguments: dict, db) -> list[str]:
     cutoff = datetime.utcnow() - timedelta(hours=24)
     recent_symbols = session.query(repos.symbols.model_class).filter(
         repos.symbols.model_class.last_updated >= cutoff
-    ).order_by(
-        repos.symbols.model_class.last_updated.desc()
     ).all()
+
+    # Get included folders and project root
+    included_folders = repos.metadata.get_included_folders()
+    project_root = repos.metadata.get_project_root()
 
     recent_changes = []
     for symbol in recent_symbols[:10]:  # Last 10
@@ -93,6 +95,8 @@ async def handle_get_project_summary(arguments: dict, db) -> list[str]:
         },
         "metadata": {
             "database_path": str(db.db_path),
+            "project_root": project_root,
+            "monitored_folders": included_folders,
             "last_indexed": datetime.utcnow().isoformat()
         },
         "suggestions": [

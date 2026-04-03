@@ -13,6 +13,8 @@
 - **FASE 1 CONCLUÍDA:** Banco SQLite + Indexador modular
 - **FASE 2 CONCLUÍDA:** Servidor MCP com 3 ferramentas
 - **FASE 3 CONCLUÍDA:** Hooks + Segurança implementadas
+- **FASE 4 CONCLUÍDA:** Suporte Multi-Linguagem Nativo (7 langs)
+- **FASE 5 EM ANDAMENTO:** Configuração de Escopo Interativa (.mcp/)
 - **Próximo:** Integração com clientes MCP (Claude Desktop, Copilot)
 
 ## Arquivos Configurados
@@ -96,6 +98,7 @@
 - [x] Instalação autônoma do pacote ✅ **CONCLUÍDO**
 - [x] Documentação completa ✅ **CONCLUÍDO**
 - [x] Migrar parser para tree-sitter nativo ✅ **CONCLUÍDO** (Decisão #011)
+- [x] Suporte Multi-Linguagem Nativo (Python, JS, TS, Go, Rust, Java, C++) ✅
+- [ ] Configuração de Escopo Interativa (.mcp/ + questionary) 🔄 **EM ANDAMENTO**
 - [ ] Integrar com Claude Desktop via config (usuário)
-- [ ] Suporte para outras linguagens (JS/TS, Go, Rust)
 - [ ] Métricas avançadas (dashboard de tokens economizados)

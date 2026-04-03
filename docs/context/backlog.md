@@ -388,19 +388,20 @@
 
 ## 🟢 P2 - Nice to Have (Backlog Futuro)
 
-### Expansão de Linguagens
-- [ ] **JavaScript/TypeScript**
-  - [ ] Parser tree-sitter para JS/TS
-  - [ ] Suporte a imports ES6
-  - [ ] Detectar exports
-
-- [ ] **Go**
-  - [ ] Parser tree-sitter para Go
-  - [ ] Detectar goroutines e channels
-
-- [ ] **Rust**
-  - [ ] Parser tree-sitter para Rust
-  - [ ] Detectar traits e impls
+### Expansão de Linguagens ✅ **CONCLUÍDO**
+- [x] **JavaScript/TypeScript**
+  - [x] Parser tree-sitter para JS/TS
+  - [x] Suporte a imports ES6/CommonJS
+  - [x] Detectar exports
+- [x] **Go**
+  - [x] Parser tree-sitter para Go
+  - [x] Detectar structs e interfaces como classes
+- [x] **Rust**
+  - [x] Parser tree-sitter para Rust
+  - [x] Detectar traits e impls
+- [x] **Java / C++**
+  - [x] Parser tree-sitter para Enterprise
+  - [x] Mapeamento de classes e herança básica
 
 ### Métricas Avançadas
 - [ ] **Dashboard de tokens**
@@ -421,6 +422,18 @@
 - [ ] **invalidate_cache**
   - [ ] Forçar re-indexação completa
   - [ ] Limpar observações obsoletas
+
+### 🎯 FASE 5: Gestão de Escopo e Portabilidade (.mcp/) ✅ **CONCLUÍDO**
+- [x] **Configuração de Metadados (Banco)**
+  - [X] Tabela `settings` e MetadataRepo.
+- [x] **Wizard Interativo**
+  - [x] Implementar `questionary.checkbox` para seleção de pastas.
+  - [x] Lógica de identificação de `project_root` (Parent de .mcp/).
+  - [x] **Discovery Preview (Dry-Run)**: Mostrar resumo de arquivos/linguagens antes de indexar.
+- [x] **Refatoração do Indexador**
+  - [x] Respeitar `included_folders` no loop de glob.
+- [x] **Transparência do Agente**
+  - [x] Incluir pastas monitoradas no `get_project_summary`.
 
 ---
 
@@ -488,4 +501,4 @@ graph TD
 
 ---
 
-**Próxima Ação:** Iniciar FASE 1.1 - Configurar ambiente uv
+**Próxima Ação:** Monitorar a experiência do usuário com o Wizard .mcp/ e planejar integração final com Claude Desktop.

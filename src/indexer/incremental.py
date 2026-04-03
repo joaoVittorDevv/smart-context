@@ -22,28 +22,55 @@ class IncrementalIndexer:
     Only re-indexes files that have changed since the last run.
     """
 
-    def __init__(self, project_root: str, language: str = 'python'):
+    def __init__(self, project_root: Optional[str] = None, language: Optional[str] = None):
         """
         Initialize incremental indexer.
 
         Args:
-            project_root: Root directory of the project
-            language: Programming language (default: 'python')
+            project_root: Root directory of the project (default: from db or current directory)
+            language: Programming language (default: None for polyglot/dynamic)
         """
-        self.project_root = Path(project_root).resolve()
-        self.language = language
-
-        # Initialize parser and analyzer
-        self.parser = CodeParser(language)
-        self.analyzer = DependencyAnalyzer()
-
-        # Initialize database
+        # Initialize database first to load settings
         self.db = DatabaseConnection()
         self.db.create_tables()
 
         # Get session and repositories
         self.session = DatabaseConnection.get_session()
         self.repos = RepositoryManager(self.session)
+
+        # Load configuration from database
+        db_root = self.repos.metadata.get_project_root()
+        self.included_folders = self.repos.metadata.get_included_folders()
+
+        if project_root:
+            self.project_root = Path(project_root).resolve()
+        elif db_root:
+            self.project_root = Path(db_root).resolve()
+        else:
+            self.project_root = Path.cwd().resolve()
+            
+        self.language = language
+
+        # Initialize parser and analyzer
+        self.parser = CodeParser(language)
+        self.analyzer = DependencyAnalyzer()
+
+    def _get_effective_patterns(self, file_patterns: Optional[List[str]]) -> List[str]:
+        """Combine specific folders with file patterns."""
+        base_patterns = file_patterns or ['**/*.py', '**/*.ts', '**/*.js', '**/*.tsx', '**/*.jsx', '**/*.go', '**/*.rs', '**/*.java', '**/*.cpp']
+        
+        if not self.included_folders:
+            return base_patterns
+            
+        effective = []
+        for folder in self.included_folders:
+            for pattern in base_patterns:
+                # If pattern starts with **/, we replace it with folder/
+                if pattern.startswith('**/'):
+                    effective.append(f"{folder}/{pattern[3:]}")
+                else:
+                    effective.append(f"{folder}/{pattern}")
+        return effective
 
     def index_incremental(
         self,
@@ -55,13 +82,12 @@ class IncrementalIndexer:
         Only indexes files that have changed since the last run.
 
         Args:
-            file_patterns: List of glob patterns (default: ['**/*.py'])
+            file_patterns: List of glob patterns (default: ['**/*.py', '**/*.ts', '**/*.js', '**/*.tsx', '**/*.jsx'])
 
         Returns:
             Dictionary with indexing statistics
         """
-        if file_patterns is None:
-            file_patterns = ['**/*.py']
+        effective_patterns = self._get_effective_patterns(file_patterns)
 
         stats = {
             'files_indexed': 0,
@@ -74,7 +100,7 @@ class IncrementalIndexer:
         start_time = time.time()
 
         # Find and index files
-        for pattern in file_patterns:
+        for pattern in effective_patterns:
             for file_path in self.project_root.glob(pattern):
                 if file_path.is_file() and self._should_index(file_path):
                     file_stats = self._index_file(file_path)
@@ -98,13 +124,12 @@ class IncrementalIndexer:
         Perform full indexing of all files.
 
         Args:
-            file_patterns: List of glob patterns (default: ['**/*.py'])
+            file_patterns: List of glob patterns (default: ['**/*.py', '**/*.ts', '**/*.js', '**/*.tsx', '**/*.jsx'])
 
         Returns:
             Dictionary with indexing statistics
         """
-        if file_patterns is None:
-            file_patterns = ['**/*.py']
+        effective_patterns = self._get_effective_patterns(file_patterns)
 
         stats = {
             'files_indexed': 0,
@@ -117,7 +142,7 @@ class IncrementalIndexer:
         start_time = time.time()
 
         # Find and index all files
-        for pattern in file_patterns:
+        for pattern in effective_patterns:
             for file_path in self.project_root.glob(pattern):
                 if file_path.is_file() and self._should_index(file_path):
                     file_stats = self._index_file(file_path, force=True)

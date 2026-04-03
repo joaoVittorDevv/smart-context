@@ -575,3 +575,131 @@ O **MVP do MCP Context Server** está pronto para uso!
 #### Próximos Passos
 - Executar Baby Step da **Fase 0**: Dinamizar e abstrair o TreeSitterParser e o Indexer, adaptando CLI `--language`.
 
+
+---
+
+## 2026-04-03 - Omni-Language Fase 1 (JS/TS)
+
+### Sessão: Suporte ao Ecossistema Web
+**Horário:** 10:32
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Bibliotecas instaladas:** `tree-sitter-javascript`, `tree-sitter-typescript` e verificação bem sucedida.
+2. **Reestruturação Registry (Fase 0):** O `ts_parser.py` agora detecta linguagens dinamicamente via `detect_language_from_path` e usa Cache de Parsers para ser re-entrante. As extensões configuradas são `['.js', '.jsx', '.cjs', '.mjs', '.ts', '.tsx']` além do Python. O parâmetro `--language` no indexer se tornou dispensável caso omitido, caindo na predição de extensão. Testes core do Python continuaram executando perfeitamente.
+3. **Parse Web:** Injetado lógica multi-language na engine do TreeSitterParser. Criados `_extract_js_ts_symbols` e `_extract_js_ts_class`.
+4. **Testes Unitários da Web:** O teste `test_web.py` cobriu Interfaces, Arrow funções, Type aliases, Traits de Export e Classes complexas, extraindo 100% de match.
+
+#### Próximos Passos
+- Avançar para a Fase 2 (Go/Rust), dependendo da anuência do usuário.
+
+
+---
+
+## 2026-04-03 - Omni-Language Fase 2 (Go / Rust)
+
+### Sessão: Suporte a Linguagens de Sistemas
+**Horário:** 10:35
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Instalação e Validação:** `tree-sitter-go` e `tree-sitter-rust` adicionadas via \`uv\`.
+2. **Registry Atualizado:** Módulos e extensões (`.go` e `.rs`) ativados no `_LANGUAGE_REGISTRY`.
+3. **Parse Engine:** Injetado `_extract_go_symbols` para interpretar type_declarations (structs e interfaces agem como class) e as declarativas de function/methods em Go. O AST do Go esconde nomes de métodos sob `field_identifier` em certos contextos, que foi logicamente roteado no `_build_symbol`.
+4. **Rust Engine:** Injetado `_extract_rust_symbols`. Captura tratos (`trait_item`) e `struct_item` como classes nativas. Para métodos, itera-se dentro de blocos `impl_item` extraindo e etiquetando `function_item` filhos como `method`.
+5. **Testes Validados:** O escopo do `test_sys.py` com ambas as gramáticas atingiu 100% de sucesso (4/4 passed).
+
+#### Próximos Passos
+- Avançar para a Fase 4 Omni-Repo, indexando tudo junto!
+
+
+---
+
+## 2026-04-03 - Conclusão da Migração Omni-Language (Fase 4)
+
+### Sessão: Finalização do Suporte Poliglota Nativo
+**Horário:** 10:51
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Teste Omni-Repo:** Criado e executado `tests/test_omni.py` que validou simultaneamente Python, JS/TS, Go, Rust, Java e C++.
+2. **Resultados:** 100% de sucesso (6/6 arquivos parseados perfeitamente).
+3. **Consolidação:** O MCP Context Server agora é oficialmente um indexador multi-linguagem nativo, sem hardcoding de linguagens no CLI — a detecção agora é baseada em extensão com suporte a detecção dinâmica.
+4. **Finalização do Plano:** Todas as fases do `multi_language_migration_plan.md` foram concluídas e testadas.
+
+#### Status do Projeto
+- 🟢 **Core Multi-Language:** OPERACIONAL
+- 🟣 **Linguagens Suportadas:** Python, JS, TS, Go, Rust, Java, C++
+- ⭐ **Eficiência:** Cache de gramáticas e detecção por extensão integrados no pipeline.
+
+#### Próximos Passos
+- Monitorar performance em repositórios massivos.
+- Considerar suporte para linguagens adicionais (PHP, Ruby) se solicitado.
+
+
+---
+
+## 2026-04-03 - Omni-Language Fase 3 (Java / C++)
+
+### Sessão: Suporte a Enterprise Clássicos
+**Horário:** 10:41
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Instalação e Validação:** `tree-sitter-java` e `tree-sitter-cpp` adicionadas via `uv`.
+2. **Registry Atualizado:** As chaves de idioma de Java e CPP foram registradas. Arquivos `.h` e `.hpp` também direcionam para as rotinas AST do C++.
+3. **Parse Java:** Implementado `_extract_java_symbols`. Recursão simplificada consegue ler `class_declaration` (e interfaces) até mesmo aninhadas e indexar os `method_declaration` das mesmas com o tipo `method`.
+4. **Parse C++:** Implementado `_extract_cpp_symbols`. Lê recursivamente `namespace_definition` para encontrar `class_specifier` e `struct_specifier`. Devido à arquitetura do C++, protótipos de método (`function_declarator` filhos de classes) e implementações (`function_definition`) são ambos identificados astutamente como `method` e funções em escopo superior como `function`.
+5. **Correção Helper:** O `_build_symbol` foi expandido para usar uma travessia recursiva simplificada quando procura por nomes do tipo `identifier` para acomodar blocos mais obscuros em C++ como `function_declarator`.
+6. **Teste Enterprise Validados:** Executaram-se 4 cenários (4/4 passed).
+
+#### Próximos Passos
+- Avançar para a Fase 4 Omni-Repo, indexando tudo junto!
+
+
+---
+
+## 2026-04-03 - Gestão de Escopo Interativa (Fase 5)
+
+### Sessão: Isolamento .mcp/ e Wizard de Inicialização
+**Horário:** 11:15
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Metadata Persistence:** Implementado `MetadataRepository` e tabela `project_metadata` para persistir caminhos de pastas e root do projeto.
+2. **Wizard Interativo:** Integrado `questionary` em `main.py init`. O sistema agora detecta se está em uma pasta `.mcp/` e sugere o diretório pai como escopo, permitindo seleção visual de pastas.
+3. **Escopo Dinâmico:** O `IncrementalIndexer` foi refatorado para carregar e respeitar essas pastas, tornando a indexação focada e economizando recursos.
+4. **Instalação Fluida:** O `install.sh` agora dispara o Wizard automaticamente, forçando a configuração do escopo no primeiro contato do usuário.
+5. **Visibilidade do Agente:** A ferramenta `get_project_summary` agora reporta as pastas monitoradas via metadados MCP.
+
+#### Status do Projeto
+- 🟢 **Core Multi-Language:** OPERACIONAL
+- 🟢 **Gestão de Escopo:** OPERACIONAL (Wizard via questionary)
+- 📂 **Estrutura Recomendada:** Repositório clonado em `projeto/.mcp/`
+
+#### Próximos Passos
+- Validar fluxo de atualização de pastas (re-run init).
+- Iniciar documentação de usuário para o novo fluxo .mcp/.
+
+
+---
+
+## 2026-04-03 - Dashboard de Antecipação (Fase 6)
+
+### Sessão: Discovery Preview (Dry-Run) e Auto-Index
+**Horário:** 11:22
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Discovery Preview:** Implementado scanner leve no Wizard `init`. Ele agora mostra um resumo de arquivos e linguagens encontradas ANTES de salvar.
+2. **Dashboard UX:** Adicionado feedback visual estilizado indicando o volume de trabalho que o indexador terá.
+3. **Confirmação de Segurança:** O usuário agora precisa confirmar explicitamente o resumo antes de gravar no DB.
+4. **Auto-Index Trigger:** Se confirmado, o sistema agora dispara a indexação full imediatamente, eliminando a necessidade de um comando manual extra.
+
+#### Status do Projeto
+- 🟢 **Wizard Completo:** Discovery -> Preview -> Confirm -> Auto-Index.
+- 🚀 **Performance:** Scanner de preview instantâneo (apenas contagem de arquivos).
+
+#### Próximos Passos
+- Monitorar feedback sobre o tempo da primeira indexação automática.
+- Refinar filtros de exclusão se necessário.

@@ -6,12 +6,15 @@ A local-first, token-efficient code context server that transforms your codebase
 
 ## 🎯 Features
 
+- **Polyglot Parsing:** Native support for Python, JS, TS, Go, Rust, Java, C++ via Tree-sitter AST
+- **Interactive Setup:** Visual Wizard (`questionary`) to select indexing folders and verify scope
+- **Discovery Preview:** Real-time dry-run scanner shows files and languages before indexing
 - **Token-efficient:** Reduces context payload from ~18k to <2.5k tokens
-- **Ultra-fast indexing:** < 100ms incremental indexing (tested: 84ms for 17 files)
+- **Ultra-fast indexing:** < 200ms incremental indexing (tree-sitter optimized)
 - **Local-first:** 100% offline, no API dependencies
 - **Smart context retrieval:** 1-Level Reach, asymmetric payload, Top 5 insights
 - **Multi-agent ready:** Works with Claude, Copilot, and any MCP-compatible tool
-- **Easy installation:** One-command setup with automated scripts
+- **Zero-Config Portability:** Install as a `.mcp/` folder inside any project for instant context
 
 ## 🚀 Quick Start
 
@@ -40,8 +43,10 @@ cd mcp_context
 
 The script will:
 - ✅ Verify `uv` is installed
-- ✅ Install the package in editable mode
-- ✅ Create necessary directories
+- ✅ Install the package and dependencies
+- ✅ **Interactive Wizard**: Step-by-step folder selection
+- ✅ **Discovery Preview**: Scan and confirm project scope
+- ✅ **Auto-Index**: Perform initial full indexing automatically
 - ✅ Display integration instructions
 
 #### Option 2: Manual Installation
@@ -322,12 +327,18 @@ Compatible with any MCP client via STDIO.
 - [x] Automated installation scripts
 - [x] Global CLI commands (`mcp-context`, `mcp-context-server`)
 
+### P1 (Current) ✅
+- [x] Tree-sitter native parsing (AST-based)
+- [x] Multi-language support (Python, JS, TS, Go, Rust, Java, C++)
+- [x] Interactive Setup Wizard (`mcp-context init`)
+- [x] Discovery Preview (Dry-Run dashboard)
+- [x] Portable `.mcp/` structure support (Scope isolation)
+
 ### P2 (Future)
-- [ ] Tree-sitter native parsing
-- [ ] Multi-language support (JS/TS, Go, Rust)
 - [ ] Advanced security (rate limiting, audit logs)
-- [ ] Performance metrics dashboard
-- [ ] Token usage analytics
+- [ ] Performance metrics dashboard (Token savings analytics)
+- [ ] Search symbols tool (Fuzzy search across files)
+- [ ] Direct export to Claude Desktop config
 
 ## 📝 License
 
@@ -342,4 +353,4 @@ Built with:
 
 ---
 
-**Status:** ✅ MVP Complete + Autonomous Installation | **Version:** 0.1.0 | **Last Updated:** 2026-04-02
+**Status:** 🟢 Stable Polyglot + Interactive Setup | **Version:** 0.2.0 | **Last Updated:** 2026-04-03
