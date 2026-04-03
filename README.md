@@ -27,17 +27,25 @@ A local-first, token-efficient code context server that transforms your codebase
 
 #### Option 1: Automated Installation (Recommended)
 
+To turn any project into a smart context-aware environment, we recommend installing this server inside a `.mcp/` folder at the root of your project:
+
 **Linux/macOS:**
 ```bash
-git clone <repo-url>
-cd mcp_context
+# From your project root:
+mkdir -p .mcp
+cd .mcp
+git clone <repo-url> context-server
+cd context-server
 ./install.sh
 ```
 
 **Windows (PowerShell):**
 ```powershell
-git clone <repo-url>
-cd mcp_context
+# From your project root:
+New-Item -ItemType Directory -Path .mcp -Force
+cd .mcp
+git clone <repo-url> context-server
+cd context-server
 .\install.ps1
 ```
 
