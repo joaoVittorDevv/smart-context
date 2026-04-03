@@ -270,3 +270,27 @@ Migrar o parser de extração de símbolos de **regex fallback** para **tree-sit
 
 ---
 
+## Decisão #012: Smart Detection de Project Root
+**Data:** 2026-04-03
+**Status:** ✅ APROVADA
+**Contexto:** Bug ao instalar em `.mcp/context-server/` — detecção incorreta do projeto root
+
+### Decisão
+Implementar **smart detection** de project root com busca ascendente por marcadores de projeto + confirmação interativa.
+
+### Justificativa
+- **Estrutura `.mcp/` flexível:** Suporta tanto `.mcp/` direto quanto `.mcp/context-server/`
+- **Marcadores de projeto:** Detecta `.git`, `pyproject.toml`, `package.json`, etc. para identificar o root real
+- **Busca ascendente:** Sobe até 5 níveis na árvore para encontrar marcadores
+- **Fallback inteligente:** Se `.mcp` está no path, extrai o pai automaticamente
+- **Override manual:** Parâmetro `--project-root` para casos edge
+- **Confirmação interativa:** Usuário valida o path detectado antes de prosseguir
+
+### Consequências
+- Nova função `_detect_project_root()` em `main.py`
+- Parâmetros `--project-root` e `--yes/-y` no comando `init`
+- Fluxo interativo com questionary para confirmação
+- Documentação atualizada em state.md e journal.md
+
+---
+

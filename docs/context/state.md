@@ -99,6 +99,6 @@
 - [x] Documentação completa ✅ **CONCLUÍDO**
 - [x] Migrar parser para tree-sitter nativo ✅ **CONCLUÍDO** (Decisão #011)
 - [x] Suporte Multi-Linguagem Nativo (Python, JS, TS, Go, Rust, Java, C++) ✅
-- [ ] Configuração de Escopo Interativa (.mcp/ + questionary) 🔄 **EM ANDAMENTO**
+- [x] Smart detection de project root para instalação em .mcp/ ✅ **CONCLUÍDO** (2026-04-03)
 - [ ] Integrar com Claude Desktop via config (usuário)
 - [ ] Métricas avançadas (dashboard de tokens economizados)

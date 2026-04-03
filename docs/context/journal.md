@@ -703,3 +703,36 @@ O **MVP do MCP Context Server** está pronto para uso!
 #### Próximos Passos
 - Monitorar feedback sobre o tempo da primeira indexação automática.
 - Refinar filtros de exclusão se necessário.
+
+
+---
+
+## 2026-04-03 - Correção de Detecção de Project Root (Bug Fix)
+
+### Sessão: Smart detection para instalação em .mcp/context-server/
+**Horário:** 11:34
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Bug Identificado:** Quando executado de `.mcp/context-server/`, o sistema detectava incorretamente `.mcp/` como project root, em vez do projeto real (ex: `trade-scalping/`).
+2. **Smart Detection Implementada:** Criada função `_detect_project_root()` que:
+   - Procura marcadores de projeto (`.git`, `pyproject.toml`, `package.json`, etc.)
+   - Sobe a árvore até encontrar marcadores (máx 5 níveis)
+   - Trata caso especial `.mcp/context-server/` → retorna o avô (projeto real)
+   - Fallback para navegação por partes se `.mcp` está no caminho
+3. **Parâmetros Adicionados:**
+   - `--project-root <path>`: Especificação manual
+   - `--yes, -y`: Skip confirmações (para automação)
+4. **Fluxo Interativo:** Confirmação do project root detectado com opção de correção manual.
+
+#### Arquivos Modificados
+- `main.py`: Nova função `_detect_project_root()` + parâmetros do `init`
+- `docs/context/state.md`: Status atualizado
+
+#### Status do Projeto
+- 🟢 **Smart Detection:** OPERACIONAL
+- 📂 **Instalação .mcp/:** Corrigida para contexto `context-server/`
+
+#### Próximos Passos
+- Testar fluxo completo em repositório real (trade-scalping)
+- Documentar novo fluxo de detecção

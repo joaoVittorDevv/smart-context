@@ -18,6 +18,70 @@ import os
 from collections import Counter
 
 
+def _detect_project_root() -> Path:
+    """
+    Smart project root detection.
+
+    Searches upward from current directory for common project markers.
+    Handles the case where running from .mcp/context-server/ subdirectory.
+    """
+    current_path = Path.cwd().resolve()
+
+    # Project markers that indicate we're at the root
+    project_markers = {
+        '.git',
+        'pyproject.toml',
+        'package.json',
+        'Cargo.toml',
+        'go.mod',
+        'pom.xml',
+        'build.gradle',
+        'setup.py',
+        'requirements.txt',
+        '.gitignore',
+    }
+
+    # Start from current directory and search upward
+    search_path = current_path
+    max_levels = 5  # Prevent infinite loops
+
+    for _ in range(max_levels):
+        # Check if we're at filesystem root
+        if search_path == search_path.parent:
+            break
+
+        # Check if current path has any project markers
+        has_markers = any(
+            (search_path / marker).exists()
+            for marker in project_markers
+        )
+
+        if has_markers:
+            # Found project markers - this is likely the root
+            return search_path
+
+        # Special case: if we're inside .mcp/, skip to parent
+        if search_path.name == '.mcp':
+            return search_path.parent
+
+        # Special case: if we're inside .mcp/context-server/ or similar
+        if search_path.parent.name == '.mcp':
+            return search_path.parent.parent
+
+        # Move up one level
+        search_path = search_path.parent
+
+    # Fallback: if no markers found, use current directory
+    # but warn if it looks like we're in a .mcp subdirectory
+    if '.mcp' in current_path.parts:
+        # Find the .mcp directory and return its parent
+        for i, part in enumerate(current_path.parts):
+            if part == '.mcp' and i > 0:
+                return Path(*current_path.parts[:i])
+
+    return current_path
+
+
 def cmd_index(args):
     """Handle index command."""
     indexer = IncrementalIndexer(
@@ -78,21 +142,30 @@ def cmd_init(args):
 
     print(f"✅ Database initialized at {db.db_path}")
 
-    # Determine project root
-    # If we are in project/.mcp/, the root is project/
-    current_path = Path.cwd().resolve()
-    if current_path.name == '.mcp' or (current_path / 'src' / 'database').exists():
-        # We are likely inside the context server directory
-        # If it's a hidden .mcp folder, go up one level
-        if current_path.name == '.mcp':
-            project_root = current_path.parent
-        else:
-            # Maybe it's just the cloned repo, assume parent is the project target
-            project_root = current_path.parent
+    # Determine project root with smart detection
+    if args.project_root:
+        project_root = Path(args.project_root).resolve()
+        print(f"📂 Using specified project root: {project_root}")
     else:
-        project_root = current_path
-
-    print(f"📂 Project Root identified as: {project_root}")
+        project_root = _detect_project_root()
+        # Allow user to override if auto-detection seems wrong
+        print(f"\n📂 Project Root detected as: {project_root}")
+    if not args.confirm:
+        confirm = questionary.confirm(
+            "Is this the correct project root?",
+            default=True
+        ).ask()
+        if not confirm:
+            # Let user specify custom path
+            custom_path = questionary.path(
+                "Enter the correct project root path:",
+                validate=lambda x: Path(x).exists() or "Path does not exist"
+            ).ask()
+            if custom_path:
+                project_root = Path(custom_path).resolve()
+            else:
+                print("❌ Initialization cancelled.")
+                return
 
     # Discovery of folders
     exclude_folders = {'.git', 'node_modules', '__pycache__', '.venv', '.mcp', '.pytest_cache', 'dist', 'build'}
@@ -246,6 +319,18 @@ Examples:
         type=str,
         default=None,
         help='Custom database path'
+    )
+    init_parser.add_argument(
+        '--project-root',
+        type=str,
+        default=None,
+        help='Project root directory (auto-detected if not specified)'
+    )
+    init_parser.add_argument(
+        '--yes', '-y',
+        action='store_true',
+        dest='confirm',
+        help='Skip confirmation prompts'
     )
 
     args = parser.parse_args()
