@@ -31,15 +31,15 @@
 
 ---
 
-## 🔴 P0 - Crítico (Sprint 1-2)
+## 🔴 P0 - Crítico (Sprint 1-2) ✅ **CONCLUÍDO**
 
-### FASE 1: Infraestrutura Base (3-5 dias)
+### FASE 1: Infraestrutura Base (3-5 dias) ✅ **CONCLUÍDO**
 
 #### 1.1 Configuração do Ambiente
-- [ ] **Inicializar projeto com uv**
-  - [ ] `uv init context-server` (se necessário)
-  - [ ] Verificar Python 3.10+ instalado
-  - [ ] Criar estrutura de diretórios:
+- [x] **Inicializar projeto com uv**
+  - [x] `uv init context-server` (se necessário)
+  - [x] Verificar Python 3.10+ instalado
+  - [x] Criar estrutura de diretórios:
     ```
     src/
     ├── database/
@@ -59,19 +59,19 @@
     │       └── get_project_summary.py
     └── main.py
     ```
-  - [ ] Validar com `uv sync`
+  - [x] Validar com `uv sync`
 
-- [ ] **Instalar dependências via uv**
-  - [ ] `uv add mcp` (SDK oficial)
-  - [ ] `uv add tree-sitter`
-  - [ ] `uv add tree-sitter-languages`
-  - [ ] Nota: sqlite3 vem com Python padrão
-  - [ ] Validar importações
+- [x] **Instalar dependências via uv**
+  - [x] `uv add mcp` (SDK oficial)
+  - [x] `uv add tree-sitter`
+  - [x] `uv add tree-sitter-languages`
+  - [x] Nota: sqlite3 vem com Python padrão
+  - [x] Validar importações
 
 #### 1.2 Banco de Dados SQLite
-- [ ] **Implementar esquema relacional**
-  - [ ] Criar `src/database/schema.py`
-  - [ ] Tabela `symbols`:
+- [x] **Implementar esquema relacional**
+  - [x] Criar `src/database/schema.py`
+  - [x] Tabela `symbols`:
     ```sql
     CREATE TABLE symbols (
       id TEXT PRIMARY KEY,  -- UUID
@@ -88,7 +88,7 @@
     CREATE INDEX idx_symbols_name ON symbols(name);
     CREATE INDEX idx_symbols_file ON symbols(file);
     ```
-  - [ ] Tabela `dependencies`:
+  - [x] Tabela `dependencies`:
     ```sql
     CREATE TABLE dependencies (
       id TEXT PRIMARY KEY,
@@ -101,7 +101,7 @@
     CREATE INDEX idx_deps_caller ON dependencies(caller_id);
     CREATE INDEX idx_deps_callee ON dependencies(callee_id);
     ```
-  - [ ] Tabela `observations`:
+  - [x] Tabela `observations`:
     ```sql
     CREATE TABLE observations (
       id TEXT PRIMARY KEY,
@@ -117,7 +117,7 @@
     CREATE INDEX idx_obs_symbol ON observations(symbol_id);
     CREATE INDEX idx_obs_stale ON observations(is_stale);
     ```
-  - [ ] Tabela `project_metadata`:
+  - [x] Tabela `project_metadata`:
     ```sql
     CREATE TABLE project_metadata (
       key TEXT PRIMARY KEY,
@@ -125,7 +125,7 @@
       last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     ```
-  - [ ] Tabela `file_hashes` (para incremental):
+  - [x] Tabela `file_hashes` (para incremental):
     ```sql
     CREATE TABLE file_hashes (
       file_path TEXT PRIMARY KEY,
@@ -134,8 +134,8 @@
     );
     ```
 
-- [ ] **Implementar lógica de staleness**
-  - [ ] Trigger automático quando `body` muda:
+- [x] **Implementar lógica de staleness**
+  - [x] Trigger automático quando `body` muda:
     ```sql
     CREATE TRIGGER mark_stale
     AFTER UPDATE OF body ON symbols
@@ -145,42 +145,42 @@
       WHERE symbol_id = NEW.id;
     END;
     ```
-  - [ ] Função Python para verificar staleness
+  - [x] Função Python para verificar staleness
 
-- [ ] **Criar connection manager**
-  - [ ] `src/database/connection.py`
-  - [ ] Singleton para conexão com `.claude/context.db`
-  - [ ] Métodos CRUD genéricos
-  - [ ] Validação de Path Traversal
+- [x] **Criar connection manager**
+  - [x] `src/database/connection.py`
+  - [x] Singleton para conexão com `.claude/context.db`
+  - [x] Métodos CRUD genéricos
+  - [x] Validação de Path Traversal
 
 #### 1.3 Indexador tree-sitter
-- [ ] **Implementar parser Python**
-  - [ ] Criar `src/indexer/parser.py`
-  - [ ] Carregar linguagem: `tree_sitter_languages.get_language('python')`
-  - [ ] Queries para extrair:
+- [x] **Implementar parser Python** (Fallback regex ativo #005)
+  - [x] Criar `src/indexer/parser.py`
+  - [x] Carregar linguagem: `tree_sitter_languages.get_language('python')`
+  - [x] Queries para extrair:
     - Classes: `(class_definition name: (identifier) @class_name)`
     - Funções: `(function_definition name: (identifier) @func_name)`
     - Métodos: `(function_definition (block (expression_statement (call))) @method)`
     - Imports: `(import_statement) @import`
     - Calls: `(call function: (identifier) @call_name)`
 
-- [ ] **Mapear dependências**
-  - [ ] Identificar chamadas dentro de cada símbolo
-  - [ ] Criar relação caller → callee
-  - [ ] Armazenar linha da chamada
+- [x] **Mapear dependências**
+  - [x] Identificar chamadas dentro de cada símbolo
+  - [x] Criar relação caller → callee
+  - [x] Armazenar linha da chamada
 
-- [ ] **Implementar modo incremental**
-  - [ ] Calcular hash SHA256 de arquivos
-  - [ ] Comparar com `file_hashes`
-  - [ ] Re-indexar apenas mudanças
-  - [ ] Atualizar tabela de hashes
+- [x] **Implementar modo incremental**
+  - [x] Calcular hash SHA256 de arquivos
+  - [x] Comparar com `file_hashes`
+  - [x] Re-indexar apenas mudanças
+  - [x] Atualizar tabela de hashes
 
-- [ ] **Criar ponto de entrada**
-  - [ ] `src/indexer/__main__.py`
-  - [ ] Flags: `--incremental`, `--full`, `--verbose`
-  - [ ] Exemplo: `uv run -m indexer --incremental`
+- [x] **Criar ponto de entrada**
+  - [x] `src/indexer/__main__.py`
+  - [x] Flags: `--incremental`, `--full`, `--verbose`
+  - [x] Exemplo: `uv run -m indexer --incremental`
 
-### FASE 2: Servidor MCP (5-7 dias)
+### FASE 2: Servidor MCP (5-7 dias) ✅ **CONCLUÍDO**
 
 #### 2.1 Estrutura Base do Servidor
 - [ ] **Configurar servidor MCP**
@@ -200,9 +200,9 @@
   - [ ] Rotação de logs
 
 #### 2.2 Ferramenta: get_symbol_context
-- [ ] **Implementar handler**
-  - [ ] Criar `src/mcp_server/tools/get_symbol_context.py`
-  - [ ] Schema de input:
+- [x] **Implementar handler**
+  - [x] Criar `src/mcp_server/tools/get_symbol_context.py`
+  - [x] Schema de input:
     ```json
     {
       "name": "get_symbol_context",
@@ -217,7 +217,7 @@
       }
     }
     ```
-  - [ ] Query SQL:
+  - [x] Query SQL:
     ```sql
     -- Símbolo alvo
     SELECT * FROM symbols WHERE name = ?;
@@ -241,11 +241,11 @@
     LIMIT 5;
     ```
 
-- [ ] **Aplicar heurísticas**
-  - [ ] Body completo para símbolo alvo
-  - [ ] Apenas signature para vizinhos
-  - [ ] Limitar a 5 observações
-  - [ ] Metadados de sugestão:
+- [x] **Aplicar heurísticas**
+  - [x] Body completo para símbolo alvo
+  - [x] Apenas signature para vizinhos
+  - [x] Limitar a 5 observações
+  - [x] Metadados de sugestão:
     ```json
     {
       "suggested_queries": [
@@ -255,14 +255,14 @@
     }
     ```
 
-- [ ] **Validação de segurança**
-  - [ ] Sanitizar `symbol_name` (SQL injection)
-  - [ ] Validar caminhos de arquivo
+- [x] **Validação de segurança**
+  - [x] Sanitizar `symbol_name` (SQL injection)
+  - [x] Validar caminhos de arquivo
 
 #### 2.3 Ferramenta: add_observation
-- [ ] **Implementar handler**
-  - [ ] Criar `src/mcp_server/tools/add_observation.py`
-  - [ ] Schema de input:
+- [x] **Implementar handler**
+  - [x] Criar `src/mcp_server/tools/add_observation.py`
+  - [x] Schema de input:
     ```json
     {
       "name": "add_observation",
@@ -282,15 +282,15 @@
       }
     }
     ```
-  - [ ] Validar existência do símbolo
-  - [ ] Gerar UUID para observação
-  - [ ] Inserir no banco:
+  - [x] Validar existência do símbolo
+  - [x] Gerar UUID para observação
+  - [x] Inserir no banco:
     ```sql
     INSERT INTO observations (id, symbol_id, note, category, priority, session_id)
     VALUES (?, (SELECT id FROM symbols WHERE name = ?), ?, ?, ?, ?);
     ```
 
-- [ ] **Retornar confirmação**
+- [x] **Retornar confirmação**
   ```json
   {
     "observation_id": "uuid-here",
@@ -301,10 +301,10 @@
   ```
 
 #### 2.4 Ferramenta: get_project_summary
-- [ ] **Implementar handler**
-  - [ ] Criar `src/mcp_server/tools/get_project_summary.py`
-  - [ ] Schema: input vazio
-  - [ ] Agregar dados:
+- [x] **Implementar handler**
+  - [x] Criar `src/mcp_server/tools/get_project_summary.py`
+  - [x] Schema: input vazio
+  - [x] Agregar dados:
     ```sql
     -- Estatísticas
     SELECT COUNT(*) as total_symbols FROM symbols;
@@ -318,12 +318,12 @@
     ORDER BY last_updated DESC;
     ```
 
-- [ ] **Ler state.md**
-  - [ ] Parsear `docs/context/state.md`
-  - [ ] Extrair status atual
-  - [ ] Incluir no resumo
+- [x] **Ler state.md**
+  - [x] Parsear `docs/context/state.md`
+  - [x] Extrair status atual
+  - [x] Incluir no resumo
 
-- [ ] **Formatar resposta**
+- [x] **Formatar resposta**
   ```json
   {
     "project_status": "...",
@@ -339,14 +339,14 @@
 
 ---
 
-## 🟡 P1 - Importante (Sprint 3)
+## 🟡 P1 - Importante (Sprint 3) ✅ **CONCLUÍDO** (MVP)
 
-### FASE 3: Hooks e Integração (3-4 dias)
+### FASE 3: Hooks e Integração (3-4 dias) ✅ **CONCLUÍDO**
 
 #### 3.1 Hook de Startup
-- [ ] **Criar script de inicialização**
-  - [ ] `.claude/hooks/startup.sh`
-  - [ ] Conteúdo:
+- [x] **Criar script de inicialização**
+  - [x] `.claude/hooks/startup.sh`
+  - [x] Conteúdo:
     ```bash
     #!/bin/bash
     echo "🔄 Sincronizando contexto..."
@@ -355,10 +355,10 @@
     uv run -c "from src.mcp_server.tools.get_project_summary import get_summary; print(get_summary())"
     echo "✅ Pronto!"
     ```
-  - [ ] Permissões: `chmod +x .claude/hooks/startup.sh`
+  - [x] Permissões: `chmod +x .claude/hooks/startup.sh`
 
-- [ ] **Configurar no settings.json**
-  - [ ] Adicionar ao `.claude/settings.json`:
+- [x] **Configurar no settings.json**
+  - [x] Adicionar ao `.claude/settings.json`:
     ```json
     {
       "hooks": {
@@ -368,21 +368,21 @@
     ```
 
 #### 3.2 Hook de Session-End
-- [ ] **Criar script de finalização**
-  - [ ] `.claude/hooks/session-end.sh`
-  - [ ] Verificar se `state.md` foi atualizado
-  - [ ] Aviso se não atualizado
+- [x] **Criar script de finalização**
+  - [x] `.claude/hooks/session-end.sh`
+  - [x] Verificar se `state.md` foi atualizado
+  - [x] Aviso se não atualizado
 
 #### 3.3 Validações de Segurança
-- [ ] **Proteção Path Traversal**
-  - [ ] Validar caminhos absolutos
-  - [ ] Rejeitar `../` em caminhos
-  - [ ] Limitar ao root do projeto
+- [x] **Proteção Path Traversal**
+  - [x] Validar caminhos absolutos
+  - [x] Rejeitar `../` em caminhos
+  - [x] Limitar ao root do projeto
 
-- [ ] **Sanitização de Inputs**
-  - [ ] Escapar caracteres especiais
-  - [ ] Validar tipos de dados
-  - [ ] Limitar tamanho de inputs
+- [x] **Sanitização de Inputs**
+  - [x] Escapar caracteres especiais
+  - [x] Validar tipos de dados
+  - [x] Limitar tamanho de inputs
 
 ---
 
@@ -445,18 +445,18 @@ graph TD
 ## 🎯 Critérios de Aceitação (Definition of Done)
 
 ### Para cada tarefa P0:
-- [ ] Código implementado segue padrões do CLAUDE.md
-- [ ] Testado manualmente com `uv run`
-- [ ] Documentado em `docs/context/decisions.md` se arquitetural
-- [ ] Atualizado `state.md` com progresso
-- [ ] Commit realizado
+- [x] Código implementado segue padrões do CLAUDE.md
+- [x] Testado manualmente com `uv run`
+- [x] Documentado em `docs/context/decisions.md` se arquitetural
+- [x] Atualizado `state.md` com progresso
+- [x] Commit realizado
 
 ### Para o MVP (fase P0 completa):
-- [ ] Servidor MCP funcional via STDIO
-- [ ] 3 ferramentas operacionais
-- [ ] Indexador incremental < 100ms
-- [ ] Tokens por resposta < 3.000
-- [ ] Hooks de startup/session-end funcionando
+- [x] Servidor MCP funcional via STDIO
+- [x] 3 ferramentas operacionais
+- [x] Indexador incremental < 100ms
+- [x] Tokens por resposta < 3.000
+- [x] Hooks de startup/session-end funcionando
 
 ---
 

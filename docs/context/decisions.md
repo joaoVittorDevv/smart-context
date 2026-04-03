@@ -244,3 +244,29 @@ Implementar **instalação autônoma** usando entry points do Python e scripts a
 - [Impacto 1]
 - [Impacto 2]
 ```
+
+## Decisão #011: Migração para Tree-sitter Nativo
+**Data:** 2026-04-03
+**Status:** ✅ APROVADA
+**Contexto:** Débito técnico #005 — parser regex limitado e \`tree-sitter-languages\` incompatível
+
+### Decisão
+Migrar o parser de extração de símbolos de **regex fallback** para **tree-sitter nativo** (v0.25+) com gramáticas individuais (\`tree-sitter-python\`).
+
+### Justificativa
+- **Incompatibilidade resolvida:** \`tree-sitter-languages\` (v1.10.2) usa a API antiga e causa \`TypeError\` com \`tree-sitter>=0.25\`. Gramáticas individuais resolvem o problema.
+- **Precisão redobrada:** De ~29 símbolos (regex via classes+funções) para ~100 símbolos (classes+funções+métodos) no mesmo projeto.
+- **AST real:** Extração baseada na árvore sintática, não em heurísticas de indentação.
+- **Suporte a decorators e async:** Regex não extraía decorators corretamente.
+- **Preparação multilinguagem:** Arquitetura com registry permite adicionar \`tree-sitter-javascript\`, \`tree-sitter-go\`, etc.
+
+### Consequências
+- Dependência \`tree-sitter-languages\` removida do \`pyproject.toml\`
+- Dependência \`tree-sitter-python\` adicionada
+- Novo arquivo \`src/indexer/ts_parser.py\` (TreeSitterParser)
+- \`simple_parser.py\` mantido como fallback via try/except
+- Bug fix: \`index_full()\` agora respeita \`_should_index()\` (filtro de .venv)
+- Teste comparativo em \`tests/test_ts_parser.py\`
+
+---
+

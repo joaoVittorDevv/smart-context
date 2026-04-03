@@ -507,3 +507,55 @@ O **MVP do MCP Context Server** está pronto para uso!
 - **Arquivos criados/modificados:** X
 - **Decisões tomadas:** X
 ```
+
+---
+
+## 2026-04-03 - Sincronização e Correção de Segurança
+
+### Sessão: Sincronização de Backlog e Bug Fix no SecurityValidator
+**Horário:** 09:48
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Análise do Projeto:** Realizado deep dive no código para verificar o status real vs documentação.
+2. **Sincronização de Backlog:** Atualizado `docs/context/backlog.md` para refletir a conclusão das P0 (Fase 1, 2, 3).
+3. **Bug Fix de Segurança:** Corrigido erro `AttributeError: 'str' object has no attribute 'isprint'` no módulo `src/security.py`. Alterado para `isprintable()`.
+4. **Validação de Ferramentas:** Teste manual realizado com sucesso via `test_mcp_tools.py`, confirmando as ferramentas `get_project_summary`, `get_symbol_context` e `add_observation`.
+
+#### Próximos Passos
+- [ ] Migrar parser regex para Tree-sitter nativo (Débito técnico #005)
+- [ ] Suporte para JS/TS (P2)
+
+#### Métricas da Sessão
+- **Arquivos modificados:** `backlog.md`, `security.py`, `journal.md`
+- **Status da Versão:** 🟢 0.1.1 (Stable MVP)
+
+
+---
+
+## 2026-04-03 - Migração Tree-sitter Nativo (Decisão #011)
+
+### Sessão: Substituição do parser regex por tree-sitter AST
+**Horário:** 09:53
+**Responsável:** Antigravity (IA)
+
+#### Atividades Realizadas
+1. **Diagnóstico de compatibilidade:** Identificado que \`tree-sitter-languages\` (v1.10.2) é incompatível com \`tree-sitter>=0.25\` (causa \`TypeError\`). A API nova exige gramáticas individuais.
+2. **Dependências atualizadas:** \`uv add tree-sitter-python\`, \`uv remove tree-sitter-languages\`.
+3. **Novo parser criado:** \`src/indexer/ts_parser.py\` (\`TreeSitterParser\`) com AST traversal e extração precisa de classes, funções, métodos e decorators.
+4. **Testes comparativos:** \`tests/test_ts_parser.py\` — 10/10 casos sintéticos + comparação em arquivos reais.
+5. **Swap realizado:** \`simple_parser.py\` agora importa \`TreeSitterParser\` como \`CodeParser\` com fallback seguro.
+6. **Bug fix bônus:** \`index_full()\` não filtrava \`.venv\` — corrigido para usar \`_should_index()\`.
+7. **Validação end-to-end:** \`mcp-context index --full\` + \`test_mcp_tools.py\` → ✅ All tests passed!
+
+#### Métricas
+- **Símbolos antes (regex):** ~20 (apenas classes e funções top-level)
+- **Símbolos depois (tree-sitter):** 100 (classes + funções + métodos)
+- **Aumento de cobertura:** 5x mais símbolos extraídos
+- **Tempo de indexação:** 171ms (26 arquivos) ✅ meta < 200ms
+- **Arquivos criados:** \`ts_parser.py\`, \`tests/test_ts_parser.py\`
+- **Arquivos modificados:** \`simple_parser.py\`, \`incremental.py\`, \`pyproject.toml\`, \`decisions.md\`, \`journal.md\`
+
+#### Bloqueios
+- Nenhum
+

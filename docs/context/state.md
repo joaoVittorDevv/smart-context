@@ -1,7 +1,7 @@
 # Estado Atual do Projeto
 
-**Última Atualização:** 2026-04-02
-**Sessão:** Documentação Completa - Instalação Autônoma
+**Última Atualização:** 2026-04-03
+**Sessão:** Migração Tree-sitter Nativo + Correções
 **Responsável:** Engenheiro de IA
 
 ## Status Geral
@@ -29,7 +29,8 @@
   - [x] Repositórios base (CRUD genérico)
   - [x] Repositórios específicos (Symbol, Dependency, Observation)
 - [x] **Indexador Modular**
-  - [x] CodeParser (regex-based para MVP)
+  - [x] TreeSitterParser (AST nativo via tree-sitter 0.25+) ✅ **MIGRADO**
+  - [x] SimpleCodeParser (regex fallback mantido)
   - [x] DependencyAnalyzer (análise de dependências)
   - [x] IncrementalIndexer (indexação incremental)
   - [x] CLI entry point (main.py)
@@ -68,12 +69,13 @@
 
 ## Métricas do MVP
 - **Tokens por mensagem:** N/A (depende de cliente MCP)
-- **Símbolos indexados:** 20 (16 classes, 4 funções)
+- **Símbolos indexados:** 100 (19 classes, 12 funções, 69 métodos) ✅ **5x mais que regex**
 - **Observações registradas:** 1 (teste)
-- **Tempo de indexação:** 84ms (✅ meta < 100ms atingida!)
+- **Tempo de indexação:** 171ms (26 arquivos, tree-sitter nativo)
 - **Ferramentas MCP:** 3 implementadas e testadas ✅
 - **Hooks:** 2 scripts automáticos ✅
 - **Validações de segurança:** Path Traversal, SQL injection, sanitização ✅
+- **Parser:** Tree-sitter nativo (Decisão #011) ✅
 
 ## Comandos Disponíveis
 - `mcp-context` - CLI para indexação, estatísticas e gerenciamento
@@ -93,7 +95,7 @@
 ## Próximos Passos (P2 - Nice to Have)
 - [x] Instalação autônoma do pacote ✅ **CONCLUÍDO**
 - [x] Documentação completa ✅ **CONCLUÍDO**
+- [x] Migrar parser para tree-sitter nativo ✅ **CONCLUÍDO** (Decisão #011)
 - [ ] Integrar com Claude Desktop via config (usuário)
-- [ ] Migrar parser para tree-sitter nativo
 - [ ] Suporte para outras linguagens (JS/TS, Go, Rust)
 - [ ] Métricas avançadas (dashboard de tokens economizados)

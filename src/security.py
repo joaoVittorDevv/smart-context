@@ -122,7 +122,7 @@ class SecurityValidator:
         # Remove control characters except newline and tab
         cleaned = ''.join(
             c for c in input_str
-            if c.isprint() or c in '\n\t'
+            if c.isprintable() or c in '\n\t'
         )
 
         return cleaned

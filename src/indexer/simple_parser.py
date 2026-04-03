@@ -184,5 +184,8 @@ class SimpleCodeParser:
         return '\n'.join(body_lines)
 
 
-# Use simple parser as fallback
-CodeParser = SimpleCodeParser
+# Use tree-sitter native parser when available, fallback to regex
+try:
+    from .ts_parser import TreeSitterParser as CodeParser
+except ImportError:
+    CodeParser = SimpleCodeParser

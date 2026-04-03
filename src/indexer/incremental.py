@@ -119,7 +119,7 @@ class IncrementalIndexer:
         # Find and index all files
         for pattern in file_patterns:
             for file_path in self.project_root.glob(pattern):
-                if file_path.is_file():
+                if file_path.is_file() and self._should_index(file_path):
                     file_stats = self._index_file(file_path, force=True)
                     stats['files_indexed'] += 1
                     stats['symbols_created'] += file_stats['symbols_created']
